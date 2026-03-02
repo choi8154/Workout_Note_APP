@@ -1,6 +1,8 @@
-def main():
-    print("Hello from workout-note-app!")
+from fastapi import FastAPI
 
+app = FastAPI()
 
-if __name__ == "__main__":
-    main()
+@app.get("/")
+def root():
+    return "루트 페이지임."
+
