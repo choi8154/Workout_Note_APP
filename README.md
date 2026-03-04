@@ -44,6 +44,7 @@
 - end_date_time[운동_끝_시간]
 - total_time[총_운동_시간]
 - created_at[생성_날짜]
+- week_day [요일]
 </details>
 
 ### workout_set: 세트 기록
