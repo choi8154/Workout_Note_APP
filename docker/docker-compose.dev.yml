@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  api:
+    container_name: api
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    env_file:
+      - ../envs/.env.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ..:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    container_name: db
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: pw123!
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pw123!
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:

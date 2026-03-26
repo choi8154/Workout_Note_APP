@@ -1,0 +1,159 @@
+[project]
+name = "ripple-drop"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.18.4",
+    "cryptography>=46.0.5",
+    "fastapi[standard]>=0.135.1",
+    "pymysql>=1.1.2",
+    "sqlalchemy>=2.0.48",
+]
+
+[dependency-groups]
+dev = [
+    "asgi-lifespan>=2.1.0",
+    "coverage>=7.13.4",
+    "httpx>=0.28.1",
+    "mypy>=1.19.1",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.0.0",
+    "resp>=0.1.2",
+    "ruff>=0.15.5",
+]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+src = ["app", "tests"]
+extend-exclude = ["alembic/versions"]
+cache-dir = ".cache/ruff"
+
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF", "S"]
+ignore = []
+fixable = ["ALL"]
+unfixable = []
+preview = false
+
+
+[tool.ruff.lint.per-file-ignores] # 파일별 ignore
+"tests/**/*.py" = ["S101"]
+"alembic/env.py" = ["E402"]
+
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+
+
+[tool.mypy]
+# 기본 설정
+python_version = "3.14"
+plugins = []
+files = ["app", "tests"] # 검사할 대상
+exclude = ["alembic/versions/"] # 제외 대상
+namespace_packages = true 
+explicit_package_bases = true # import 해석 꼬임이 줄어듦
+cache_dir = ".cache/mypy"
+
+# 경고 조정
+warn_return_any = true # 반환 타입이 Any일 때 경고
+warn_unused_configs = true # 오타 확인
+warn_redundant_casts = true # 쓸대없는 cast 잡기
+warn_unused_ignores = true # 필요없는  type: ignore 정리해 줌
+warn_no_return = true # 반환해야 하는 함수가 반환 안 하는 경우 경고
+warn_unreachable = true # 도달 불가 코드 경고
+
+# strict = true 대신 옵션 세부조정
+strict_optional = true # None 관련 타입 검사를 엄격히
+check_untyped_defs = true
+disallow_untyped_defs = true # 타입힌트 없는 함수 검사
+disallow_incomplete_defs = true # 미완성 타입힌트 함수 금지
+disallow_untyped_calls = false # 타입이 있는 함수 안에서 타입 없는 함수 호출 금지 << 라이브러리 때문에 false
+disallow_any_generics = true # list[str] 처럼 명확히 쓰도록 유도
+no_implicit_optional = true # 암묵적인 타입힌팅 금지. ex) def f(x: str = None)금지, def f(x: str | None = None)으로 ㄱㄱ
+
+# 출력
+show_error_codes = true # 로그 보고 어느 규칙인지 출력
+pretty = true # 로그 이쁘게 출력
+
+ignore_missing_imports = false # 라이브러리 타입 정보 없을 때 에러 무시 여부.
+follow_imports = "normal"
+
+# 모듈별로 설정 수정.
+[[tool.mypy.overrides]]
+module = ["tests.*"] # 라이브러리 타입 문제 생기면 여기 추가하면 됨.
+disallow_untyped_defs = false
+
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+addopts = """
+-ra
+-q
+--strict-markers
+--strict-config
+--maxfail=1
+--cov=app
+--cov-report=term-missing
+--cov-report=xml
+"""
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+  "unit: unit tests",
+  "integration: integration tests",
+  "slow: slow tests",
+] # @pytest.mark.unit 을 오버라이딩 해서 해당 테스트에 tag를 붙임
+filterwarnings = [
+  "error",
+  "ignore::DeprecationWarning:pkg_resources",
+]
+xfail_strict = true # 실패를 예상한 테스트에 @pytest.mark.xfail(reason="응~알고있어~") 를 오버라이딩 해서 pass 시킴
+cache_dir = ".cache/pytest"
+
+[tool.coverage.run]
+data_file = ".cache/coverage/.coverage"
+branch = true
+source = ["app"]
+omit = [
+  "tests/*",
+  "alembic/*",
+]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+skip_covered = false # 100% 커버된 파일 숨기기
+skip_empty = true
+precision = 2 # 소수점 자리수
+exclude_lines = [
+  "pragma: no cover",
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+] # 제외할 코드 패턴
+
+[tool.coverage.html]
+directory = ".cache/coverage/htmlcov"
+
+[tool.coverage.xml]
+output = ".cache/coverage/coverage.xml"
+
+[tool.coverage.json]
+output = ".cache/coverage/coverage.json"
+
+[tool.coverage.lcov]
+output = ".cache/coverage/coverage.lcov"
