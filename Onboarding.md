@@ -51,6 +51,8 @@ DATABASE_NAME=mydb
 - `git config commit.template .gitmessage.txt`: 파일 적용
 - 사용법은 `.gitmessage.txt`에서 확인
 
+## 권한 주기
+
 -------------------
 
 ## 5. 코드 최적화 툴 사용법
